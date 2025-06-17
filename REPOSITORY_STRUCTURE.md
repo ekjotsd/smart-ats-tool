@@ -2,7 +2,7 @@
 
 ## 📁 **Root Directory**
 ```
-MCP/
+Smart ATS Tool/
 ├── 📄 flask_app.py              # Main Flask application (1,325 lines)
 ├── 📄 database.py               # Database configuration and models
 ├── 📄 utils.py                  # Utility functions and helpers
@@ -11,15 +11,7 @@ MCP/
 ├── 📄 mcq_utils.py             # Multiple choice question utilities
 ├── 📄 requirements.txt          # Python dependencies
 ├── 📄 setup.py                  # Package setup configuration
-├── 📄 test_api.py              # API testing utilities
-├── 📄 test_psychometric.py     # Psychometric testing utilities
 ├── 📄 compile_scss.py          # SCSS compilation script
-├── 📄 cookies.txt              # Session cookies storage
-├── 📄 env.example              # Environment variables template
-├── 📄 .gitignore               # Git ignore patterns
-├── 📄 Dockerfile               # Docker container configuration
-├── 📄 docker-compose.yml       # Multi-service Docker setup
-└── 📄 quick_start.sh/.bat      # Platform-specific startup scripts
 ```
 
 ## 📂 **Core Directories**
