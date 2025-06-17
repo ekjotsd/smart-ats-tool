@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Smart ATS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-graph-up"></i> Resume Analysis Results</h1>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h2 class="text-success">{{ analysis.overall_match_percentage or 'N/A' }}</h2>
+                    <p>Overall Match</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h2 class="text-primary">{{ analysis.matching_skills|length }}</h2>
+                    <p>Skills Matched</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h2 class="text-warning">{{ analysis.missing_skills|length }}</h2>
+                    <p>Skills to Develop</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analysis Tabs -->
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="analysisTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="skills-tab" data-bs-toggle="tab" 
+                            data-bs-target="#skills" type="button">
+                        <i class="bi bi-gear"></i> Skills Analysis
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="experience-tab" data-bs-toggle="tab" 
+                            data-bs-target="#experience" type="button">
+                        <i class="bi bi-briefcase"></i> Experience Match
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="recommendations-tab" data-bs-toggle="tab" 
+                            data-bs-target="#recommendations" type="button">
+                        <i class="bi bi-lightbulb"></i> Recommendations
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tools-tab" data-bs-toggle="tab" 
+                            data-bs-target="#tools" type="button">
+                        <i class="bi bi-tools"></i> Tools
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="analysisTabContent">
+                <!-- Skills Analysis -->
+                <div class="tab-pane fade show active" id="skills" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-success"><i class="bi bi-check-circle"></i> Matching Skills</h5>
+                            {% for skill in analysis.matching_skills %}
+                            <div class="badge bg-success me-2 mb-2">{{ skill.skill_name }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Missing Skills</h5>
+                            {% for skill in analysis.missing_skills %}
+                            <div class="mb-3">
+                                <span class="badge bg-warning">{{ skill.skill_name }}</span>
+                                <p class="small text-muted mt-1">{{ skill.suggestion }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience Match -->
+                <div class="tab-pane fade" id="experience" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-briefcase"></i> Experience Analysis</h5>
+                            <p>{{ analysis.experience_match_analysis or 'No experience analysis available.' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-mortarboard"></i> Education Analysis</h5>
+                            <p>{{ analysis.education_match_analysis or 'No education analysis available.' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="tab-pane fade" id="recommendations" role="tabpanel">
+                    <h5><i class="bi bi-lightbulb"></i> Key Recommendations</h5>
+                    {% for rec in analysis.recommendations_for_improvement %}
+                    <div class="alert alert-info">
+                        <h6><strong>{{ rec.recommendation }}</strong></h6>
+                        <p><strong>Section:</strong> {{ rec.section }}</p>
+                        <p><strong>Guidance:</strong> {{ rec.guidance }}</p>
+                    </div>
+                    {% endfor %}
+
+                    <h5 class="mt-4"><i class="bi bi-robot"></i> ATS Optimization</h5>
+                    {% for suggestion in analysis.ats_optimization_suggestions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ suggestion.section }}</h6>
+                            {% if suggestion.current_content %}
+                            <p><strong>Current:</strong> {{ suggestion.current_content }}</p>
+                            {% endif %}
+                            <p><strong>Suggested Change:</strong> {{ suggestion.suggested_change }}</p>
+                            {% if suggestion.keywords_to_add %}
+                            <p><strong>Keywords to Add:</strong> 
+                                {% for keyword in suggestion.keywords_to_add %}
+                                <span class="badge bg-primary">{{ keyword }}</span>
+                                {% endfor %}
+                            </p>
+                            {% endif %}
+                            {% if suggestion.reason %}
+                            <p class="text-muted"><strong>Reason:</strong> {{ suggestion.reason }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Tools -->
+                <div class="tab-pane fade" id="tools" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="bi bi-envelope"></i> Generate Cover Letter</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('generate_cover_letter_route') }}">
+                                        <div class="mb-3">
+                                            <label for="tone" class="form-label">Select Tone</label>
+                                            <select class="form-select" name="tone">
+                                                <option value="professional">Professional</option>
+                                                <option value="enthusiastic">Enthusiastic</option>
+                                                <option value="confident">Confident</option>
+                                                <option value="friendly">Friendly</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary" id="coverLetterBtn">
+                                            <span class="btn-text">
+                                                <i class="bi bi-envelope"></i> Generate Cover Letter
+                                            </span>
+                                            <span class="btn-loading d-none">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                Generating...
+                                            </span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="bi bi-file-earmark-text"></i> Generate Updated Resume</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Get an improved version of your resume based on the analysis.</p>
+                                    <form method="POST" action="{{ url_for('generate_updated_resume_route') }}">
+                                        <button type="submit" class="btn btn-success" id="enhanceResumeBtn">
+                                            <span class="btn-text">
+                                                <i class="bi bi-file-earmark-text"></i> Generate Updated Resume
+                                            </span>
+                                            <span class="btn-loading d-none">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                                Enhancing...
+                                            </span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cover Letter Button Loading
+    const coverLetterForm = document.querySelector('form[action="{{ url_for("generate_cover_letter_route") }}"]');
+    const coverLetterBtn = document.getElementById('coverLetterBtn');
+    
+    if (coverLetterForm && coverLetterBtn) {
+        coverLetterForm.addEventListener('submit', function() {
+            // Show loading state
+            coverLetterBtn.querySelector('.btn-text').classList.add('d-none');
+            coverLetterBtn.querySelector('.btn-loading').classList.remove('d-none');
+            coverLetterBtn.disabled = true;
+        });
+    }
+    
+    // Enhanced Resume Button Loading
+    const enhanceResumeForm = document.querySelector('form[action="{{ url_for("generate_updated_resume_route") }}"]');
+    const enhanceResumeBtn = document.getElementById('enhanceResumeBtn');
+    
+    if (enhanceResumeForm && enhanceResumeBtn) {
+        enhanceResumeForm.addEventListener('submit', function() {
+            // Show loading state
+            enhanceResumeBtn.querySelector('.btn-text').classList.add('d-none');
+            enhanceResumeBtn.querySelector('.btn-loading').classList.remove('d-none');
+            enhanceResumeBtn.disabled = true;
+        });
+    }
+});
+</script>
+
+{% endblock %} 

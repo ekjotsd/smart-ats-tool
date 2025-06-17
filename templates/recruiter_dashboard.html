@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Dashboard - Smart ATS{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=4">
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="brand-logo">
+        <div class="logo">S</div>
+        <div>
+            <div style="font-weight: 600; color: #333;">Smart ATS</div>
+            <div style="font-size: 0.8rem; color: #6c757d;">Recruiter Panel</div>
+        </div>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="{{ url_for('dashboard') }}" class="nav-link" id="dashboard-link">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('psychometric_test') }}" class="nav-link" id="psychometric-link">
+                <i class="bi bi-clipboard-check"></i>
+                Psychometric Test
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('resume_ranking') }}" class="nav-link" id="resume-ranking-link">
+                <i class="bi bi-bar-chart"></i>
+                Resume Ranking
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Logout Section -->
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout ({{ username }})
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">Recruiter Dashboard</h1>
+                <p class="page-subtitle">Welcome back, {{ username }}! Manage candidates, assessments, and hiring processes.</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="status-badge status-active me-3">Recruiter</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">147</div>
+            <div class="stat-label">Total Applications</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">23</div>
+            <div class="stat-label">High Match (>80%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">54</div>
+            <div class="stat-label">Medium Match (60-80%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">70</div>
+            <div class="stat-label">Low Match (<60%)</div>
+        </div>
+    </div>
+
+    <!-- Tools Overview -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px auto; color: white;">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <h5 class="card-title">Psychometric Assessment</h5>
+                    <p class="card-text text-muted">Generate comprehensive behavioral and cognitive assessment questions to evaluate candidate personality, skills, and cultural fit.</p>
+                    <a href="{{ url_for('psychometric_test') }}" class="btn btn-primary">
+                        <i class="bi bi-play-circle me-2"></i>Start Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div style="width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px auto; color: white;">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+                    <h5 class="card-title">Resume Ranking System</h5>
+                    <p class="card-text text-muted">Upload multiple resumes and automatically rank them against job descriptions using AI-powered analysis and scoring.</p>
+                    <a href="{{ url_for('resume_ranking') }}" class="btn btn-primary">
+                        <i class="bi bi-upload me-2"></i>Rank Resumes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Candidate Data -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-table me-2"></i>Recent Candidate Applications
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Candidate Name</th>
+                                <th>Match Score</th>
+                                <th>Skills Matched</th>
+                                <th>Skills Missing</th>
+                                <th>Profile Summary</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                            AK
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: #333;">Alice Kumar</div>
+                                            <div style="font-size: 0.85rem; color: #6c757d;">Software Engineer</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="skill-badge matched">92%</span></td>
+                                <td><span class="skill-badge">18 skills</span></td>
+                                <td><span class="skill-badge missing">2 missing</span></td>
+                                <td>Strong in data analysis and Python development</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                            RM
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: #333;">Raj Mehta</div>
+                                            <div style="font-size: 0.85rem; color: #6c757d;">Project Manager</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="skill-badge">76%</span></td>
+                                <td><span class="skill-badge">12 skills</span></td>
+                                <td><span class="skill-badge missing">5 missing</span></td>
+                                <td>Excellent project management and communication skills</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                            SL
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: #333;">Sara Lim</div>
+                                            <div style="font-size: 0.85rem; color: #6c757d;">UI/UX Designer</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="skill-badge matched">88%</span></td>
+                                <td><span class="skill-badge">16 skills</span></td>
+                                <td><span class="skill-badge missing">3 missing</span></td>
+                                <td>Expert in JavaScript, React, and modern UI design</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                            MJ
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: #333;">Michael Johnson</div>
+                                            <div style="font-size: 0.85rem; color: #6c757d;">Data Scientist</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="skill-badge">72%</span></td>
+                                <td><span class="skill-badge">14 skills</span></td>
+                                <td><span class="skill-badge missing">4 missing</span></td>
+                                <td>Strong background in machine learning and analytics</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function showComingSoon() {
+    alert('This feature is coming soon! Stay tuned for updates.');
+}
+
+// Add active state to current navigation item
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    
+    // Remove active class from all nav links first
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class based on current path
+    if (currentPath === '/dashboard' || currentPath === '/') {
+        document.getElementById('dashboard-link').classList.add('active');
+    } else if (currentPath === '/psychometric_test') {
+        document.getElementById('psychometric-link').classList.add('active');
+    } else if (currentPath === '/resume_ranking') {
+        document.getElementById('resume-ranking-link').classList.add('active');
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,663 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Ranking - Smart ATS{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=4">
+<style>
+/* Additional styles for resume ranking */
+.upload-area {
+    border: 2px dashed #667eea;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    background: #f8f9ff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #764ba2;
+    background: #f0f2ff;
+}
+
+.upload-area.dragover {
+    border-color: #764ba2;
+    background: #e8ebff;
+    transform: scale(1.02);
+}
+
+.file-item {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: between;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 12px;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.file-size {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.remove-file:hover {
+    background: #f8d7da;
+}
+
+.results-table {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results-table table {
+    margin: 0;
+}
+
+.results-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 15px;
+}
+
+.results-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.results-table tr:last-child td {
+    border-bottom: none;
+}
+
+.score-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+}
+
+.score-badge.excellent {
+    background: #d4edda;
+    color: #155724;
+}
+
+.score-badge.good {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.score-badge.average {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.score-badge.poor {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.rank-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.progress-ring {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px auto;
+}
+
+.progress-ring circle {
+    fill: none;
+    stroke: #667eea;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+    animation: progress-animation 2s linear infinite;
+}
+
+@keyframes progress-animation {
+    0% { stroke-dasharray: 0 188; }
+    50% { stroke-dasharray: 94 188; }
+    100% { stroke-dasharray: 0 188; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="brand-logo">
+        <div class="logo">S</div>
+        <div>
+            <div style="font-weight: 600; color: #333;">Smart ATS</div>
+            <div style="font-size: 0.8rem; color: #6c757d;">Resume Ranking</div>
+        </div>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('psychometric_test') }}" class="nav-link">
+                <i class="bi bi-clipboard-check"></i>
+                Psychometric Test
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('resume_ranking') }}" class="nav-link active">
+                <i class="bi bi-bar-chart"></i>
+                Resume Ranking
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Logout Section -->
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout ({{ session.username }})
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">Resume Ranking System</h1>
+                <p class="page-subtitle">Upload multiple resumes and rank them against job descriptions using AI-powered analysis.</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="status-badge status-active me-3">Ranking Tool</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Section -->
+    <div class="card" id="config-section">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-gear me-2"></i>Configuration
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="model-select" class="form-label">AI Model</label>
+                    <select class="form-select" id="model-select">
+                        {% for display_name, model_value in models.items() %}
+                            <option value="{{ model_value }}" {% if model_value == 'deepseek-r1-distill-llama-70b' %}selected{% endif %}>
+                                {{ display_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="ranking-method" class="form-label">Ranking Method</label>
+                    <select class="form-select" id="ranking-method">
+                        <option value="tfidf">TF-IDF (Fast)</option>
+                        <option value="llm" selected>LLM-Based (Detailed)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Description Section -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-file-text me-2"></i>Job Description
+            </h5>
+        </div>
+        <div class="card-body">
+            <textarea class="form-control" id="job-description" rows="6" 
+                      placeholder="Enter the job description here..."></textarea>
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Provide a detailed job description including required skills, experience, and qualifications for better ranking accuracy.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Upload Section -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-upload me-2"></i>Upload Resumes
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="upload-area" id="upload-area">
+                <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 15px;"></i>
+                <h5>Drop PDF files here or click to browse</h5>
+                <p class="text-muted">Upload multiple resume files in PDF format</p>
+                <input type="file" id="file-input" multiple accept=".pdf" style="display: none;">
+            </div>
+            
+            <div id="file-list" class="mt-3" style="display: none;">
+                <h6 class="mb-3">Uploaded Files:</h6>
+                <div id="files-container">
+                    <!-- Uploaded files will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mb-4">
+        <button type="button" class="btn btn-primary btn-lg" id="rank-resumes-btn" disabled>
+            <i class="bi bi-play-circle me-2"></i>Rank Resumes
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-lg ms-3" id="clear-all-btn">
+            <i class="bi bi-arrow-clockwise me-2"></i>Clear All
+        </button>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-trophy me-2"></i>Ranking Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Analysis Complete!</strong> Resumes ranked by <span id="method-used">TF-IDF</span> method.
+                </div>
+                
+                <div class="results-table">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Resume</th>
+                                <th>Score</th>
+                                <th id="explanation-header" style="display: none;">Explanation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-tbody">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <button type="button" class="btn btn-outline-primary" id="export-results-btn">
+                        <i class="bi bi-download me-2"></i>Export Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+        <svg class="progress-ring">
+            <circle cx="30" cy="30" r="28"></circle>
+        </svg>
+        <h5>Processing Resumes...</h5>
+        <p class="text-muted mb-0">Please wait while we analyze and rank the resumes.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Global variables
+let uploadedFiles = [];
+let rankingResults = [];
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeEventListeners();
+});
+
+function initializeEventListeners() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    
+    // Upload area events
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', handleDragOver);
+    uploadArea.addEventListener('dragleave', handleDragLeave);
+    uploadArea.addEventListener('drop', handleDrop);
+    
+    // File input change
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    // Button events
+    document.getElementById('rank-resumes-btn').addEventListener('click', rankResumes);
+    document.getElementById('clear-all-btn').addEventListener('click', clearAll);
+    document.getElementById('export-results-btn').addEventListener('click', exportResults);
+    
+    // Form change events
+    document.getElementById('job-description').addEventListener('input', updateRankButton);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    
+    const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+    addFiles(files);
+}
+
+function handleFileSelect(e) {
+    const files = Array.from(e.target.files);
+    addFiles(files);
+}
+
+function addFiles(files) {
+    files.forEach(file => {
+        if (file.type === 'application/pdf' && !uploadedFiles.find(f => f.name === file.name)) {
+            uploadedFiles.push(file);
+        }
+    });
+    
+    updateFileList();
+    updateRankButton();
+}
+
+function updateFileList() {
+    const fileList = document.getElementById('file-list');
+    const filesContainer = document.getElementById('files-container');
+    
+    if (uploadedFiles.length === 0) {
+        fileList.style.display = 'none';
+        return;
+    }
+    
+    fileList.style.display = 'block';
+    filesContainer.innerHTML = '';
+    
+    uploadedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <div class="file-icon">
+                <i class="bi bi-file-earmark-pdf"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatFileSize(file.size)}</div>
+            </div>
+            <button class="remove-file" onclick="removeFile(${index})">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        `;
+        filesContainer.appendChild(fileItem);
+    });
+}
+
+function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    updateFileList();
+    updateRankButton();
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateRankButton() {
+    const jobDescription = document.getElementById('job-description').value.trim();
+    const rankButton = document.getElementById('rank-resumes-btn');
+    
+    rankButton.disabled = !(jobDescription && uploadedFiles.length > 0);
+}
+
+async function rankResumes() {
+    const jobDescription = document.getElementById('job-description').value.trim();
+    const model = document.getElementById('model-select').value;
+    const method = document.getElementById('ranking-method').value;
+    
+    if (!jobDescription || uploadedFiles.length === 0) {
+        alert('Please provide a job description and upload at least one resume.');
+        return;
+    }
+    
+    // Show loading overlay
+    document.getElementById('loading-overlay').style.display = 'flex';
+    
+    try {
+        const formData = new FormData();
+        formData.append('job_description', jobDescription);
+        formData.append('model', model);
+        formData.append('method', method);
+        
+        uploadedFiles.forEach((file, index) => {
+            formData.append(`resume_${index}`, file);
+        });
+        
+        const response = await fetch('/api/rank_resumes', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to rank resumes');
+        }
+        
+        const results = await response.json();
+        displayResults(results);
+        
+    } catch (error) {
+        alert('Error ranking resumes: ' + error.message);
+    } finally {
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+}
+
+function displayResults(results) {
+    rankingResults = results.results;
+    
+    // Update method used
+    document.getElementById('method-used').textContent = results.method === 'tfidf' ? 'TF-IDF' : 'LLM-Based';
+    
+    // Show/hide explanation column
+    const explanationHeader = document.getElementById('explanation-header');
+    explanationHeader.style.display = results.method === 'llm' ? 'table-cell' : 'none';
+    
+    // Populate results table
+    const tbody = document.getElementById('results-tbody');
+    tbody.innerHTML = '';
+    
+    rankingResults.forEach((result, index) => {
+        const row = document.createElement('tr');
+        
+        const scoreClass = getScoreClass(result.score);
+        const scoreDisplay = results.method === 'tfidf' ? 
+            (result.score * 100).toFixed(1) + '%' : 
+            result.score + '/100';
+        
+        row.innerHTML = `
+            <td>
+                <div class="rank-badge">${index + 1}</div>
+            </td>
+            <td>
+                <div class="file-name">${result.filename}</div>
+            </td>
+            <td>
+                <span class="score-badge ${scoreClass}">${scoreDisplay}</span>
+            </td>
+            ${results.method === 'llm' ? `<td>${result.explanation || 'No explanation available'}</td>` : ''}
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Show results section
+    document.getElementById('results-section').style.display = 'block';
+    
+    // Scroll to results
+    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function getScoreClass(score) {
+    // For TF-IDF scores (0-1 range)
+    if (score <= 1) {
+        if (score >= 0.8) return 'excellent';
+        if (score >= 0.6) return 'good';
+        if (score >= 0.4) return 'average';
+        return 'poor';
+    }
+    
+    // For LLM scores (0-100 range)
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    if (score >= 40) return 'average';
+    return 'poor';
+}
+
+function clearAll() {
+    uploadedFiles = [];
+    rankingResults = [];
+    
+    document.getElementById('job-description').value = '';
+    document.getElementById('file-input').value = '';
+    
+    updateFileList();
+    updateRankButton();
+    
+    document.getElementById('results-section').style.display = 'none';
+}
+
+function exportResults() {
+    if (rankingResults.length === 0) {
+        alert('No results to export');
+        return;
+    }
+    
+    // Create CSV content
+    let csvContent = 'Rank,Resume,Score';
+    if (rankingResults[0].explanation) {
+        csvContent += ',Explanation';
+    }
+    csvContent += '\n';
+    
+    rankingResults.forEach((result, index) => {
+        csvContent += `${index + 1},"${result.filename}",${result.score}`;
+        if (result.explanation) {
+            csvContent += `,"${result.explanation.replace(/"/g, '""')}"`;
+        }
+        csvContent += '\n';
+    });
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'resume_ranking_results.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %} 

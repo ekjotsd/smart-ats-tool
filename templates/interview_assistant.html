@@ -1,0 +1,981 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Assistant - Smart ATS{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=4">
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="brand-logo">
+        <div class="logo">I</div>
+        <div>
+            <div style="font-weight: 600; color: #333;">Smart ATS</div>
+            <div style="font-size: 0.8rem; color: #6c757d;">Interview Assistant</div>
+        </div>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <i class="bi bi-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Logout Section -->
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" class="nav-link logout-link">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout ({{ username }})
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="page-title">
+                    <i class="bi bi-robot me-3"></i>Interview Assistant
+                </h1>
+                <p class="page-subtitle">Generate AI-powered interview questions and evaluate candidate responses with advanced analytics</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="status-badge status-active me-3">AI-Powered</span>
+                <div class="model-selector-compact">
+                    <select class="form-select form-select-sm" id="modelSelect">
+                        <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="llama3-70b-8192">Llama 3 70B</option>
+                        <option value="mistral-saba-24b">Mistral Saba 24B</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content-wrapper">
+        <!-- Setup Tab -->
+        <div class="tab-pane active" id="setup-content">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-text me-2"></i>Interview Configuration
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="interviewSetupForm">
+                                <!-- Job Description -->
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Job Description *</label>
+                                    <textarea class="form-control" id="jobDescription" rows="6" 
+                                            placeholder="Paste the complete job description here..." required></textarea>
+                                    <div class="form-text">Provide a detailed job description for accurate question generation</div>
+                                </div>
+
+                                <!-- Candidate Resume -->
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Candidate Resume (Optional)</label>
+                                    <div class="file-upload-area" id="resumeUploadArea">
+                                        <input type="file" class="form-control" id="candidateResume" accept=".pdf" style="display: none;">
+                                        <div class="upload-placeholder" id="uploadPlaceholder">
+                                            <div class="upload-icon">
+                                                <i class="bi bi-cloud-upload"></i>
+                                            </div>
+                                            <div class="upload-text">
+                                                <strong>Click to upload resume</strong> or drag and drop
+                                            </div>
+                                            <div class="upload-hint">PDF files only (Max 10MB)</div>
+                                        </div>
+                                        <div class="uploaded-file" id="uploadedFile" style="display: none;">
+                                            <div class="file-info">
+                                                <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                                                <span class="file-name" id="fileName"></span>
+                                                <span class="file-size" id="fileSize"></span>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeResume()">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-text">Upload candidate's resume for personalized questions. AI will analyze the resume content to generate targeted questions.</div>
+                                </div>
+
+                                <!-- Configuration Row -->
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Number of Questions</label>
+                                        <select class="form-select" id="questionCount">
+                                            <option value="5">5 Questions (15-20 min)</option>
+                                            <option value="10" selected>10 Questions (30-40 min)</option>
+                                            <option value="15">15 Questions (45-60 min)</option>
+                                            <option value="20">20 Questions (60-80 min)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Difficulty Level</label>
+                                        <select class="form-select" id="difficultyLevel">
+                                            <option value="junior">Entry Level (0-2 years)</option>
+                                            <option value="mid" selected>Mid Level (3-5 years)</option>
+                                            <option value="senior">Senior Level (6+ years)</option>
+                                            <option value="lead">Lead/Principal Level</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Interview Type</label>
+                                        <select class="form-select" id="interviewType">
+                                            <option value="screening">Initial Screening</option>
+                                            <option value="technical" selected>Technical Interview</option>
+                                            <option value="behavioral">Behavioral Interview</option>
+                                            <option value="final">Final Round</option>
+                                            <option value="panel">Panel Interview</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Question Categories -->
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Question Categories</label>
+                                    <div class="category-selection">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="technical" name="categories" value="technical" checked>
+                                                    <label class="form-check-label" for="technical">
+                                                        <span class="category-badge technical">Technical Skills</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="behavioral" name="categories" value="behavioral" checked>
+                                                    <label class="form-check-label" for="behavioral">
+                                                        <span class="category-badge behavioral">Behavioral</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="cultural" name="categories" value="cultural">
+                                                    <label class="form-check-label" for="cultural">
+                                                        <span class="category-badge cultural">Cultural Fit</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="leadership" name="categories" value="leadership">
+                                                    <label class="form-check-label" for="leadership">
+                                                        <span class="category-badge leadership">Leadership</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="problem_solving" name="categories" value="problem_solving" checked>
+                                                    <label class="form-check-label" for="problem_solving">
+                                                        <span class="category-badge problem-solving">Problem Solving</span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check category-check">
+                                                    <input class="form-check-input" type="checkbox" id="communication" name="categories" value="communication">
+                                                    <label class="form-check-label" for="communication">
+                                                        <span class="category-badge communication">Communication</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Generate Button -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                        <i class="bi bi-magic me-2"></i>Generate Interview Questions
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Highlights Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="bi bi-star me-2"></i>AI Features
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="feature-list">
+                                <div class="feature-item">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-brain"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Smart Question Generation</div>
+                                        <div class="feature-description">AI analyzes job requirements to create relevant questions</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-person-check"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Personalized Questions</div>
+                                        <div class="feature-description">Tailored questions based on candidate's resume</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-graph-up"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Response Evaluation</div>
+                                        <div class="feature-description">AI-powered scoring and detailed feedback</div>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <div class="feature-content">
+                                        <div class="feature-title">Comprehensive Reports</div>
+                                        <div class="feature-description">Detailed interview reports with recommendations</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro Tips -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="bi bi-lightbulb me-2"></i>Pro Tips
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="tip-list">
+                                <div class="tip-item">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    Include specific technical requirements in the job description
+                                </div>
+                                <div class="tip-item">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    Add candidate resume for personalized questions
+                                </div>
+                                <div class="tip-item">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    Select appropriate difficulty level for the role
+                                </div>
+                                <div class="tip-item">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    Mix different question categories for comprehensive evaluation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Tab -->
+        <div class="tab-pane" id="questions-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-chat-dots me-2"></i>Generated Interview Questions
+                        </h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="regenerateQuestions()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Regenerate
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="questionsContainer">
+                        <div class="text-center py-5">
+                            <i class="bi bi-chat-dots" style="font-size: 3rem; color: #6c757d;"></i>
+                            <h5 class="mt-3 text-muted">No questions generated yet</h5>
+                            <p class="text-muted">Complete the setup to generate AI-powered interview questions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conduct Tab -->
+        <div class="tab-pane" id="conduct-content">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-mic me-2"></i>Conduct Interview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="bi bi-mic" style="font-size: 3rem; color: #6c757d;"></i>
+                        <h5 class="mt-3 text-muted">Interview Conductor</h5>
+                        <p class="text-muted">Generate questions first to start conducting the interview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluation Tab -->
+        <div class="tab-pane" id="evaluation-content">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-check me-2"></i>Evaluation & Report
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="bi bi-clipboard-check" style="font-size: 3rem; color: #6c757d;"></i>
+                        <h5 class="mt-3 text-muted">Interview Evaluation</h5>
+                        <p class="text-muted">Complete the interview to generate evaluation reports</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <h5>Generating Questions...</h5>
+        <p class="text-muted mb-0">AI is analyzing the job description and creating personalized interview questions</p>
+    </div>
+</div>
+
+<style>
+/* Interview Assistant Specific Styles */
+.model-selector-compact {
+    min-width: 200px;
+}
+
+.interview-progress {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    margin-top: 20px;
+}
+
+.progress-header h6 {
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.progress-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    transition: all 0.2s ease;
+}
+
+.progress-step.active {
+    color: #667eea;
+}
+
+.progress-step.completed {
+    color: #28a745;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+}
+
+.progress-step.active .step-number {
+    background: #667eea;
+    color: white;
+}
+
+.progress-step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.tab-content-wrapper {
+    min-height: 600px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.category-selection {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.category-check {
+    margin-bottom: 12px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.category-badge.technical { background: #e3f2fd; color: #1976d2; }
+.category-badge.behavioral { background: #f3e5f5; color: #7b1fa2; }
+.category-badge.cultural { background: #e8f5e8; color: #388e3c; }
+.category-badge.leadership { background: #fff3e0; color: #f57c00; }
+.category-badge.problem-solving { background: #fce4ec; color: #c2185b; }
+.category-badge.communication { background: #e0f2f1; color: #00796b; }
+
+/* File Upload Styles */
+.file-upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #f8f9fa;
+}
+
+.file-upload-area:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.file-upload-area.dragover {
+    border-color: #667eea;
+    background: #e3f2fd;
+}
+
+.upload-placeholder {
+    padding: 20px;
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #333;
+    margin-right: 10px;
+}
+
+.file-size {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.feature-content {
+    flex: 1;
+}
+
+.feature-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.feature-description {
+    color: #6c757d;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.tip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.question-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid #667eea;
+    transition: all 0.2s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.question-header {
+    display: flex;
+    justify-content-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.question-number {
+    background: #667eea;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.question-text {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.question-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.detail-badge {
+    background: #f8f9fa;
+    color: #6c757d;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    display: none;
+}
+
+.loading-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .interview-progress {
+        display: none;
+    }
+    
+    .progress-steps {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .step-label {
+        display: none;
+    }
+}
+</style>
+
+<script>
+let currentTab = 'setup';
+let generatedQuestions = [];
+let uploadedResumeText = '';
+
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-pane').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-content').classList.add('active');
+    
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Update progress steps
+    updateProgressSteps(tabName);
+    
+    currentTab = tabName;
+}
+
+function updateProgressSteps(activeTab) {
+    const steps = ['setup', 'questions', 'conduct', 'evaluation'];
+    const activeIndex = steps.indexOf(activeTab);
+    
+    steps.forEach((step, index) => {
+        const stepElement = document.getElementById('step-' + step);
+        if (stepElement) {  // Only update if element exists
+            stepElement.classList.remove('active', 'completed');
+            
+            if (index < activeIndex) {
+                stepElement.classList.add('completed');
+            } else if (index === activeIndex) {
+                stepElement.classList.add('active');
+            }
+        }
+    });
+}
+
+// Form submission
+document.getElementById('interviewSetupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        job_description: document.getElementById('jobDescription').value,
+        candidate_resume: uploadedResumeText,
+        question_count: parseInt(document.getElementById('questionCount').value),
+        difficulty_level: document.getElementById('difficultyLevel').value,
+        interview_type: document.getElementById('interviewType').value,
+        categories: Array.from(document.querySelectorAll('input[name="categories"]:checked')).map(cb => cb.value),
+        model: document.getElementById('modelSelect').value
+    };
+    
+    if (!formData.job_description.trim()) {
+        alert('Please provide a job description');
+        return;
+    }
+    
+    if (formData.categories.length === 0) {
+        alert('Please select at least one question category');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    
+    try {
+        const response = await fetch('/api/generate_interview_questions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            generatedQuestions = result.questions;
+            displayQuestions(result.questions);
+            showTab('questions');
+            
+            // Enable navigation to questions tab (only if element exists)
+            const navQuestions = document.getElementById('nav-questions');
+            if (navQuestions) {
+                navQuestions.classList.remove('disabled');
+            }
+        } else {
+            alert('Error generating questions: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    } finally {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+});
+
+function displayQuestions(questions) {
+    const container = document.getElementById('questionsContainer');
+    
+    if (!questions || questions.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #ffc107;"></i>
+                <h5 class="mt-3 text-warning">No questions generated</h5>
+                <p class="text-muted">Please try again with different parameters</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    questions.forEach((question, index) => {
+        let followUpHtml = '';
+        if (question.follow_up_questions) {
+            followUpHtml = `
+                <div class="follow-up-section">
+                    <h6 class="text-muted mb-2">Follow-up Questions:</h6>
+                    <ul class="list-unstyled">
+                        ${question.follow_up_questions.map(fq => '<li class="text-muted mb-1">• ' + fq + '</li>').join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        let evaluationHtml = '';
+        if (question.evaluation_criteria) {
+            evaluationHtml = `
+                <div class="evaluation-section mt-3">
+                    <h6 class="text-muted mb-2">Evaluation Criteria:</h6>
+                    <div class="question-details">
+                        ${question.evaluation_criteria.map(criteria => '<span class="detail-badge">' + criteria + '</span>').join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += `
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-number">${index + 1}</div>
+                    <span class="category-badge ${question.category}">${question.category.replace('_', ' ').toUpperCase()}</span>
+                </div>
+                <div class="question-text">${question.question}</div>
+                ${followUpHtml}
+                ${evaluationHtml}
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function regenerateQuestions() {
+    if (confirm('Are you sure you want to regenerate the questions? This will replace the current questions.')) {
+        document.getElementById('interviewSetupForm').dispatchEvent(new Event('submit'));
+    }
+}
+
+// File upload handling
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('candidateResume');
+    const uploadArea = document.getElementById('resumeUploadArea');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const uploadedFile = document.getElementById('uploadedFile');
+    
+    // Only add event listeners if elements exist
+    if (fileInput && uploadArea && uploadPlaceholder && uploadedFile) {
+        // Click to upload
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // File selection
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/pdf') {
+                    fileInput.files = files;
+                    handleFileSelect({ target: { files: [file] } });
+                } else {
+                    alert('Please upload a PDF file only.');
+                }
+            }
+        });
+    }
+    
+    showTab('setup');
+});
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file only.');
+        return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        alert('File size must be less than 10MB.');
+        return;
+    }
+    
+    // Show uploaded file info (with null checks)
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const uploadedFile = document.getElementById('uploadedFile');
+    
+    if (fileName && fileSize && uploadPlaceholder && uploadedFile) {
+        fileName.textContent = file.name;
+        fileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        uploadPlaceholder.style.display = 'none';
+        uploadedFile.style.display = 'flex';
+        
+        // Extract text from PDF
+        extractTextFromPDF(file);
+    }
+}
+
+function extractTextFromPDF(file) {
+    const formData = new FormData();
+    formData.append('resume', file);
+    
+    fetch('/api/extract_resume_text', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            uploadedResumeText = data.text;
+            console.log('Resume text extracted successfully');
+        } else {
+            console.error('Failed to extract resume text:', data.error);
+            alert('Failed to extract text from PDF. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error extracting resume text:', error);
+        alert('Error processing PDF file.');
+    });
+}
+
+function removeResume() {
+    document.getElementById('candidateResume').value = '';
+    document.getElementById('uploadPlaceholder').style.display = 'block';
+    document.getElementById('uploadedFile').style.display = 'none';
+    uploadedResumeText = '';
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    showTab('setup');
+});
+</script>
+{% endblock %} 
