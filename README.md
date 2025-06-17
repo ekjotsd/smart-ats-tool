@@ -165,43 +165,6 @@ pip install gunicorn
 gunicorn -w 4 -b 0.0.0.0:5000 flask_app:app
 ```
 
-## 💻 **Usage**
-
-### **1. Resume Analysis**
-```python
-# Upload resume via web interface or API
-POST /analyze_resume
-Content-Type: multipart/form-data
-
-# Response includes:
-{
-  "ats_score": 85,
-  "feedback": ["Improve keyword density", "Add more quantifiable achievements"],
-  "suggestions": ["Include specific technologies", "Optimize formatting"]
-}
-```
-
-### **2. Cover Letter Generation**
-```python
-# Generate personalized cover letter
-POST /generate_cover_letter
-{
-  "job_description": "Software Engineer position...",
-  "resume_text": "Experienced developer...",
-  "company_name": "TechCorp"
-}
-```
-
-### **3. Interview Preparation**
-```python
-# Get interview questions
-POST /generate_interview_questions
-{
-  "job_role": "Software Engineer",
-  "experience_level": "mid",
-  "num_questions": 10
-}
-```
 
 ## 🎭 **User Roles**
 
