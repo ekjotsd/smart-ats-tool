@@ -171,21 +171,18 @@ gunicorn -w 4 -b 0.0.0.0:5000 flask_app:app
 ### **👨‍💼 Applicant Dashboard**
 - Resume upload and analysis
 - Cover letter generation
-- Interview question practice
-- Psychometric assessments
-- Progress tracking
+- Resume Generation
+- Skill Analysis
+
 
 ### **👩‍💼 Recruiter Dashboard**
 - Bulk resume processing
 - Candidate ranking
-- Interview question management
-- Assessment creation
+- Psychometric assessments
 
 ### **🏢 Company Dashboard**
-- Team management
-- Hiring analytics
-- Custom assessments
-- API integration
+- Interview question generation
+- 
 
 ## 🤖 **AI Features**
 
@@ -246,9 +243,6 @@ POST /api/psychometric_test
 Authorization: Bearer <token>
 ```
 
-## 🐳 **Docker Deployment**
-
-
 
 ## 📈 **Performance**
 
@@ -279,9 +273,6 @@ Authorization: Bearer <token>
 - **Kubernetes**: Orchestrated scaling
 - **Traditional VPS**: Direct server deployment
 
-## 🤝 **Contributing**
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### **Development Process**
 1. Fork the repository
