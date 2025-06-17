@@ -40,7 +40,6 @@ rag/
 scripts/
 ├── 📄 complete_setup.py        # Comprehensive setup automation
 ├── 📄 download_dataset.py      # Kaggle dataset downloader
-├── 📄 index.py                # Index management utilities
 ├── 📄 init_vector_db.py       # Vector database initialization
 ├── 📄 setup.py                # Basic setup script
 └── 📄 validate.py             # System validation checks
