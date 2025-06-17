@@ -27,32 +27,14 @@ The AI Hiring Platform is a comprehensive Flask-based web application that lever
                        └─────────────────┘
 ```
 
-## 👥 User Roles & Features
+## 👥 User Roles
 
 ### 🎓 Applicants
-| Feature | Description | AI Component |
-|---------|-------------|--------------|
-| Resume Analysis | ATS optimization and skill matching | GPT-4o-mini analysis |
-| Cover Letter Generator | Personalized cover letters | Multi-tone generation |
-| Resume Enhancement | AI-driven improvements | Content optimization |
-| FAQ Assistant | Career guidance Q&A | RAG-powered responses |
-| Skills Gap Analysis | Missing skills identification | AI skill extraction |
 
 ### 🏢 Recruiters
-| Feature | Description | AI Component |
-|---------|-------------|--------------|
-| Psychometric Testing | AI-generated assessments | Dynamic question creation |
-| Resume Ranking | Multi-model scoring | TF-IDF + LLM ranking |
-| Candidate Evaluation | Automated assessment | Response analysis |
-| Bulk Processing | Multiple resume analysis | Batch processing |
 
 ### 🏭 Hiring Companies
-| Feature | Description | AI Component |
-|---------|-------------|--------------|
-| Interview Assistant | Question generation | Role-specific questions |
-| Candidate Analytics | Hiring insights | Performance metrics |
-| Response Evaluation | Interview assessment | AI-powered scoring |
-| Workflow Automation | Process streamlining | Automated workflows |
+
 
 ## 🔧 Core Modules
 
