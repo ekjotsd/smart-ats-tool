@@ -7,21 +7,6 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## 📋 **Table of Contents**
-- [🌟 Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [🚀 Quick Start](#-quick-start)
-- [📦 Installation](#-installation)
-- [🔧 Configuration](#-configuration)
-- [💻 Usage](#-usage)
-- [🎭 User Roles](#-user-roles)
-- [🤖 AI Features](#-ai-features)
-- [📊 API Documentation](#-api-documentation)
-- [🐳 Docker Deployment](#-docker-deployment)
-- [🧪 Testing](#-testing)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-
 ## 🌟 **Features**
 
 ### **For Job Applicants** 👨‍💼
