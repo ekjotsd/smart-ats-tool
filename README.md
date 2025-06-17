@@ -57,7 +57,6 @@ graph TB
 - **Vector DB**: Pinecone (RAG system)
 - **Frontend**: Bootstrap 5, HTML5, CSS3, JavaScript
 - **PDF**: ReportLab, Pillow
-- **Deployment**: Docker, GitHub Actions
 
 ## 🚀 **Quick Start**
 
@@ -125,31 +124,6 @@ UPLOAD_FOLDER=uploads
 KAGGLE_USERNAME=your_kaggle_username
 KAGGLE_KEY=your_kaggle_key
 ```
-
-## 🔧 **Configuration**
-
-### **Development Setup**
-```bash
-# Install development dependencies
-pip install -r requirements.txt
-
-# Set Flask environment
-export FLASK_ENV=development
-export FLASK_DEBUG=1
-
-# Run with auto-reload
-py flask_app.py
-```
-
-### **Production Setup**
-```bash
-# Use production WSGI server
-pip install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 flask_app:app
-```
-
 
 ## 🎭 **User Roles**
 
@@ -229,42 +203,6 @@ Authorization: Bearer <token>
 ```
 
 
-## 📈 **Performance**
-
-- **Resume Processing**: < 3 seconds per document
-- **AI Response Time**: < 5 seconds for generation
-- **Concurrent Users**: 100+ supported
-- **Database**: Optimized for 10,000+ resumes
-- **API Rate Limit**: 1000 requests/hour per user
-
-## 🔒 **Security**
-
-- **Authentication**: Session-based with secure cookies
-- **File Upload**: Virus scanning and type validation
-- **API Security**: Rate limiting and input sanitization
-- **Data Privacy**: GDPR compliant data handling
-- **Encryption**: All sensitive data encrypted at rest
-
-## 🚀 **Deployment Options**
-
-### **Cloud Platforms**
-- **Heroku**: One-click deployment
-- **AWS EC2**: Scalable infrastructure
-- **Google Cloud**: Managed services
-- **DigitalOcean**: Cost-effective hosting
-
-### **Self-Hosted**
-- **Docker**: Containerized deployment
-- **Kubernetes**: Orchestrated scaling
-- **Traditional VPS**: Direct server deployment
-
-
-### **Development Process**
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
 
 ### **Code Style**
 - Follow PEP 8 for Python code
