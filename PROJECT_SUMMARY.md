@@ -12,7 +12,6 @@ The AI Hiring Platform is a comprehensive Flask-based web application that lever
 - **Frontend**: Bootstrap 5, HTML5, CSS3, JavaScript
 - **File Processing**: PyPDF2, ReportLab
 - **Vector Database**: FAISS (for RAG system)
-- **Containerization**: Docker, Docker Compose
 
 ### System Components
 ```
